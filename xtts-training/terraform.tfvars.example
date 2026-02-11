@@ -1,9 +1,0 @@
-# SSH 공개키 생성 필요
-# ssh-keygen -t rsa -b 4096 -f ~/.ssh/xtts-training-key -N ""
-
-ssh_public_key = "YOUR_SSH_PUBLIC_KEY_HERE"
-
-# 선택적 변경
-# region = "us-east-1"
-# instance_type = "g5.xlarge"
-# volume_size = 100

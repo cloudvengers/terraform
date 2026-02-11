@@ -17,6 +17,16 @@ resource "aws_instance" "app_a" {     # resource "aws_instance" "app_a": EC2 인
   subnet_id              = aws_subnet.private_app_a.id       # subnet_id: 이 인스턴스를 배치할 서브넷입니다. 프라이빗 앱 서브넷 A에 배치하여 인터넷에서 직접 접근할 수 없게 합니다
   vpc_security_group_ids = [aws_security_group.app.id]       # vpc_security_group_ids: 적용할 보안 그룹 목록입니다. 앱 보안 그룹을 적용하여 ALB에서 오는 80번 포트 트래픽만 허용합니다
 
+  # user_data: 인스턴스 시작 시 자동으로 실행되는 스크립트입니다. 웹서버(Apache)를 설치하고 시작합니다
+  user_data = <<-EOF
+              #!/bin/bash
+              yum update -y                                    # yum update: 시스템 패키지를 최신 버전으로 업데이트합니다
+              yum install -y httpd                             # yum install httpd: Apache 웹서버를 설치합니다
+              systemctl start httpd                            # systemctl start: Apache 웹서버를 시작합니다
+              systemctl enable httpd                           # systemctl enable: 서버 재부팅 시 Apache가 자동으로 시작되도록 설정합니다
+              echo "<h1>App Server A</h1>" > /var/www/html/index.html   # echo: 웹서버의 기본 페이지를 생성합니다. ALB 헬스체크와 서버 구분용입니다
+              EOF
+
   tags = {                             # tags: EC2 인스턴스에 붙일 태그입니다
     Name = "app-server-a"             # Name 태그: AWS 콘솔에서 "app-server-a"로 표시됩니다. 어떤 서버인지 쉽게 구분할 수 있습니다
   }
@@ -28,6 +38,16 @@ resource "aws_instance" "app_c" {     # resource "aws_instance" "app_c": 두 번
   instance_type          = var.instance_type        # instance_type: 앱 서버 A와 동일한 사양을 사용합니다
   subnet_id              = aws_subnet.private_app_c.id       # subnet_id: 프라이빗 앱 서브넷 C에 배치합니다. 서버 A와 다른 가용영역에 있어 물리적으로 분리됩니다
   vpc_security_group_ids = [aws_security_group.app.id]       # vpc_security_group_ids: 앱 서버 A와 동일한 보안 그룹을 적용합니다
+
+  # user_data: 인스턴스 시작 시 자동으로 실행되는 스크립트입니다. 웹서버(Apache)를 설치하고 시작합니다
+  user_data = <<-EOF
+              #!/bin/bash
+              yum update -y                                    # yum update: 시스템 패키지를 최신 버전으로 업데이트합니다
+              yum install -y httpd                             # yum install httpd: Apache 웹서버를 설치합니다
+              systemctl start httpd                            # systemctl start: Apache 웹서버를 시작합니다
+              systemctl enable httpd                           # systemctl enable: 서버 재부팅 시 Apache가 자동으로 시작되도록 설정합니다
+              echo "<h1>App Server C</h1>" > /var/www/html/index.html   # echo: 웹서버의 기본 페이지를 생성합니다. ALB 헬스체크와 서버 구분용입니다
+              EOF
 
   tags = {                             # tags: EC2 인스턴스에 붙일 태그입니다
     Name = "app-server-c"             # Name 태그: AWS 콘솔에서 "app-server-c"로 표시됩니다

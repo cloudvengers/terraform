@@ -98,13 +98,13 @@ resource "aws_security_group" "db" {   # resource "aws_security_group" "db": DB(
   description = "Security group for RDS"  # description: RDS용 보안 그룹임을 설명합니다
   vpc_id      = aws_vpc.main.id        # vpc_id: main VPC에 소속시킵니다
 
-  # 인바운드 규칙: ALB 보안 그룹에서 오는 MySQL(3306) 트래픽만 허용
-  # 참고: 실제로는 App SG를 참조하는 것이 더 적절할 수 있습니다
+  # 인바운드 규칙: App 서버에서 오는 MySQL(3306) 트래픽만 허용
+  # EC2 앱 서버가 RDS에 접근하여 데이터를 읽고 쓸 수 있도록 합니다
   ingress {                            # ingress: 인바운드 규칙입니다. 데이터베이스 접근을 제한합니다
     from_port       = 3306             # from_port: 3306은 MySQL 데이터베이스의 기본 포트입니다
     to_port         = 3306             # to_port: 3306 포트만 허용합니다
     protocol        = "tcp"            # protocol: TCP 프로토콜입니다. 데이터베이스 통신은 TCP를 사용합니다
-    security_groups = [aws_security_group.alb.id]  # security_groups: ALB 보안 그룹에서 오는 트래픽만 허용합니다. (참고: 보안 강화를 위해 aws_security_group.app.id로 변경하는 것을 권장합니다)
+    security_groups = [aws_security_group.app.id]  # security_groups: App 보안 그룹에서 오는 트래픽만 허용합니다. EC2 앱 서버만 RDS에 접근할 수 있습니다
   }
 
   # 아웃바운드 규칙: 모든 트래픽 허용
