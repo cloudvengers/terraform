@@ -1,3 +1,16 @@
+# Internet Gateway 생성
+resource "aws_internet_gateway" "igw" {                            # Internet Gateway 리소스 정의
+  vpc_id = aws_vpc.main.id                                         # 연결할 VPC ID
+
+  tags = {                                                         # 태그 맵
+    Name = "igw"                                                   # Internet Gateway 이름
+  }
+}
+
+# =====================================================
+# IPAM
+# =====================================================
+
 # 현재 AWS 리전 정보 조회
 data "aws_region" "current" {}                                     # 현재 프로바이더의 리전 정보를 가져오는 데이터 소스
 

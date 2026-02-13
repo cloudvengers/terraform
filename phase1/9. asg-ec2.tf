@@ -16,13 +16,13 @@ resource "aws_launch_template" "app" {                             # Launch Temp
     http_tokens   = "required"                                     # IMDSv2 토큰 필수 (보안 강화)
   }
 
-  # 인스턴스 초기화 스크립트
-  user_data = base64encode(<<-EOF                                  # User Data를 Base64로 인코딩
-    #!/bin/bash                                                    # Bash 셸 스크립트 시작
-    dnf install -y httpd                                           # Apache 웹 서버 설치
-    systemctl start httpd                                          # Apache 서비스 시작
-    systemctl enable httpd                                         # 부팅 시 Apache 자동 시작 설정
-    echo "<h1>Hello from $(hostname)</h1>" > /var/www/html/index.html  # 테스트용 HTML 페이지 생성
+  # 인스턴스 초기화 스크립트 (User Data를 Base64로 인코딩)
+  user_data = base64encode(<<-EOF
+    #!/bin/bash
+    dnf install -y httpd
+    systemctl start httpd
+    systemctl enable httpd
+    echo "<h1>Hello from $(hostname)</h1>" > /var/www/html/index.html
   EOF
   )
 
