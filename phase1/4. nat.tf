@@ -1,33 +1,35 @@
-# 1. 퍼블릭 서브넷 A의 NAT Gateway에서 사용할 eip
-resource "aws_eip" "nat_eip_a" {
-  tags = {
-    Name = "nat-eip-a"
+# Elastic IP for NAT Gateway A
+resource "aws_eip" "nat_eip_a" {                                   # Elastic IP 리소스 정의 (NAT Gateway A용)
+  
+  tags = {                                                         # 태그 맵
+    Name = "nat-eip-a"                                             # EIP 이름
   }
 }
 
-# 2. 퍼블릭 서브넷 C의 NAT Gateway에서 사용할 eip
-resource "aws_eip" "nat_eip_c" {
-  tags = {
-    Name = "nat-eip-c"
+# Elastic IP for NAT Gateway C
+resource "aws_eip" "nat_eip_c" {                                   # Elastic IP 리소스 정의 (NAT Gateway C용)
+  
+  tags = {                                                         # 태그 맵
+    Name = "nat-eip-c"                                             # EIP 이름
   }
 }
 
-# 3. 퍼블릭 서브넷 A의 Nat Gateway
-resource "aws_nat_gateway" "nat_gw_a" {
-  allocation_id = aws_eip.nat_eip_a.id
-  subnet_id     = aws_subnet.public_a.id
+# NAT Gateway A (Public Subnet A)
+resource "aws_nat_gateway" "nat_gw_a" {                            # NAT Gateway 리소스 정의 (가용 영역 A)
+  allocation_id = aws_eip.nat_eip_a.id                             # 연결할 Elastic IP ID
+  subnet_id     = aws_subnet.public_a.id                           # NAT Gateway를 배치할 Public Subnet ID
 
-  tags = {
-    Name = "public-subnet-a-nat-gw"
+  tags = {                                                         # 태그 맵
+    Name = "public-subnet-a-nat-gw"                                # NAT Gateway 이름
   }
 }
 
-# 4. 퍼블릭 서브넷 C의 Nat Gateway
-resource "aws_nat_gateway" "nat_gw_c" {
-  allocation_id = aws_eip.nat_eip_c.id
-  subnet_id     = aws_subnet.public_c.id
+# NAT Gateway C (Public Subnet C)
+resource "aws_nat_gateway" "nat_gw_c" {                            # NAT Gateway 리소스 정의 (가용 영역 C)
+  allocation_id = aws_eip.nat_eip_c.id                             # 연결할 Elastic IP ID
+  subnet_id     = aws_subnet.public_c.id                           # NAT Gateway를 배치할 Public Subnet ID
 
-  tags = {
-    Name = "public-subnet-c-nat-gw"
+  tags = {                                                         # 태그 맵
+    Name = "public-subnet-c-nat-gw"                                # NAT Gateway 이름
   }
 }

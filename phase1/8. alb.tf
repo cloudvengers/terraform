@@ -1,45 +1,46 @@
-# ALB - 사용자 요청을 여러 EC2에 분산
-resource "aws_lb" "app" {
-  name               = "app-alb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.alb.id]
-  subnets            = [aws_subnet.public_a.id, aws_subnet.public_c.id]
+# Application Load Balancer 생성
+resource "aws_lb" "app" {                                          # ALB 리소스 정의
+  name               = "app-alb"                                   # ALB 이름
+  internal           = false                                       # 인터넷 연결 (false = 외부 접근 가능)
+  load_balancer_type = "application"                               # 로드 밸런서 타입 (Application)
+  security_groups    = [aws_security_group.alb.id]                # 보안 그룹 ID 목록
+  subnets            = [aws_subnet.public_a.id, aws_subnet.public_c.id] # Public Subnet ID 목록 (다중 AZ)
 
-  tags = {
-    Name = "app-alb"
+  tags = {                                                         # 태그 맵
+    Name = "app-alb"                                               # ALB 이름 태그
   }
 }
 
-# Target Group - ALB가 트래픽을 보낼 EC2들의 그룹
-resource "aws_lb_target_group" "app" {
-  name     = "app-tg"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main.id
+# Target Group 생성 (ALB가 트래픽을 전달할 대상 그룹)
+resource "aws_lb_target_group" "app" {                             # Target Group 리소스 정의
+  name     = "app-tg"                                              # Target Group 이름
+  port     = 80                                                    # 대상 포트
+  protocol = "HTTP"                                                # 프로토콜
+  vpc_id   = aws_vpc.main.id                                       # VPC ID
 
-  # EC2 헬스체크
-  health_check {
-    path                = "/"
-    healthy_threshold   = 2
-    unhealthy_threshold = 3
-    timeout             = 5
-    interval            = 30
+  # Health Check 설정
+  health_check {                                                   # 헬스체크 블록
+    path                = "/"                                      # 헬스체크 경로
+    healthy_threshold   = 2                                        # 정상 판정 임계값 (연속 성공 횟수)
+    unhealthy_threshold = 3                                        # 비정상 판정 임계값 (연속 실패 횟수)
+    timeout             = 5                                        # 타임아웃 (초)
+    interval            = 30                                       # 헬스체크 간격 (초)
   }
 
-  tags = {
-    Name = "app-tg"
+  tags = {                                                         # 태그 맵
+    Name = "app-tg"                                                # Target Group 이름 태그
   }
 }
 
-# Listener - ALB의 80번 포트로 들어오는 요청을 어디로 보낼지 정의
-resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.app.arn
-  port              = 80
-  protocol          = "HTTP"
+# ALB Listener 생성 (들어오는 요청을 처리하는 규칙)
+resource "aws_lb_listener" "http" {                                # Listener 리소스 정의
+  load_balancer_arn = aws_lb.app.arn                               # ALB ARN
+  port              = 80                                           # 리스너 포트
+  protocol          = "HTTP"                                       # 프로토콜
 
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.app.arn
+  # 기본 동작 설정
+  default_action {                                                 # 기본 액션 블록
+    type             = "forward"                                   # 액션 타입 (forward = 전달)
+    target_group_arn = aws_lb_target_group.app.arn                 # 전달할 Target Group ARN
   }
 }

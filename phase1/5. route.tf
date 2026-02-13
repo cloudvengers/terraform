@@ -1,99 +1,121 @@
-# 1. 퍼블릭 서브넷 전용 라우팅 테이블 생성
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id
+# =====================================================
+# Public Subnet Route Table
+# =====================================================
 
-  tags = {
-    Name = "public-rt"
+# Public Route Table 생성
+resource "aws_route_table" "public" {                              # Public Route Table 리소스 정의
+  vpc_id = aws_vpc.main.id                                         # VPC ID
+
+  tags = {                                                         # 태그 맵
+    Name = "public-rt"                                             # Route Table 이름
   }
 }
 
-# 2. 모든 외부 트래픽(0.0.0.0/0)을 인터넷 게이트웨이(igw)로 보내는 라우팅 규칙
-resource "aws_route" "public_internet" {
-  route_table_id         = aws_route_table.public.id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.igw.id
+# Public Route - Internet Gateway로 라우팅
+resource "aws_route" "public_internet" {                           # Public Route 리소스 정의
+  route_table_id         = aws_route_table.public.id               # Route Table ID
+  destination_cidr_block = "0.0.0.0/0"                             # 목적지 CIDR (모든 외부 트래픽)
+  gateway_id             = aws_internet_gateway.igw.id             # Internet Gateway ID
 }
 
-# 3. 라우팅 테이블을 만들고 규칙 추가했다면, 실제 서브넷에 연결
-
-# 퍼블릭 서브넷 A에 라우팅 테이블 연결
-resource "aws_route_table_association" "public_a" {
-  subnet_id      = aws_subnet.public_a.id
-  route_table_id = aws_route_table.public.id
+# Public Subnet A에 Route Table 연결
+resource "aws_route_table_association" "public_a" {                # Route Table Association 리소스 정의
+  subnet_id      = aws_subnet.public_a.id                          # 연결할 Subnet ID
+  route_table_id = aws_route_table.public.id                       # 연결할 Route Table ID
 }
 
-# 퍼블릭 서브넷 C에 라우팅 테이블 연결
-resource "aws_route_table_association" "public_c" {
-  subnet_id      = aws_subnet.public_c.id
-  route_table_id = aws_route_table.public.id
+# Public Subnet C에 Route Table 연결
+resource "aws_route_table_association" "public_c" {                # Route Table Association 리소스 정의
+  subnet_id      = aws_subnet.public_c.id                          # 연결할 Subnet ID
+  route_table_id = aws_route_table.public.id                       # 연결할 Route Table ID
 }
 
-# ===========================================================
+# =====================================================
+# Private App Subnet A Route Table
+# =====================================================
 
-# 1. 프라이빗 앱 서브넷 A 전용 라우팅 테이블
-resource "aws_route_table" "private_app_a" {
-  vpc_id = aws_vpc.main.id
+# Private App Route Table A 생성
+resource "aws_route_table" "private_app_a" {                       # Private App Route Table 리소스 정의 (가용 영역 A)
+  vpc_id = aws_vpc.main.id                                         # VPC ID
 
-  tags = {
-    Name = "private-app-rt-a"
+  tags = {                                                         # 태그 맵
+    Name = "private-app-rt-a"                                      # Route Table 이름
   }
 }
 
-resource "aws_route" "private_app_internet_a" {
-  route_table_id         = aws_route_table.private_app_a.id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.nat_gw_a.id
+# Private App Route A - NAT Gateway A로 라우팅
+resource "aws_route" "private_app_internet_a" {                    # Private App Route 리소스 정의
+  route_table_id         = aws_route_table.private_app_a.id        # Route Table ID
+  destination_cidr_block = "0.0.0.0/0"                             # 목적지 CIDR (모든 외부 트래픽)
+  nat_gateway_id         = aws_nat_gateway.nat_gw_a.id             # NAT Gateway A ID
 }
 
-resource "aws_route_table_association" "private_a" {
-  subnet_id      = aws_subnet.private_app_a.id
-  route_table_id = aws_route_table.private_app_a.id
+# Private App Subnet A에 Route Table 연결
+resource "aws_route_table_association" "private_a" {               # Route Table Association 리소스 정의
+  subnet_id      = aws_subnet.private_app_a.id                     # 연결할 Subnet ID
+  route_table_id = aws_route_table.private_app_a.id                # 연결할 Route Table ID
 }
 
-# 2. 프라이빗 앱 서브넷 C 전용 라우팅 테이블
-resource "aws_route_table" "private_app_c" {
-  vpc_id = aws_vpc.main.id
+# =====================================================
+# Private App Subnet C Route Table
+# =====================================================
 
-  tags = {
-    Name = "private-app-rt-c"
+# Private App Route Table C 생성
+resource "aws_route_table" "private_app_c" {                       # Private App Route Table 리소스 정의 (가용 영역 C)
+  vpc_id = aws_vpc.main.id                                         # VPC ID
+
+  tags = {                                                         # 태그 맵
+    Name = "private-app-rt-c"                                      # Route Table 이름
   }
 }
 
-resource "aws_route" "private_app_internet_c" {
-  route_table_id         = aws_route_table.private_app_c.id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.nat_gw_c.id
+# Private App Route C - NAT Gateway C로 라우팅
+resource "aws_route" "private_app_internet_c" {                    # Private App Route 리소스 정의
+  route_table_id         = aws_route_table.private_app_c.id        # Route Table ID
+  destination_cidr_block = "0.0.0.0/0"                             # 목적지 CIDR (모든 외부 트래픽)
+  nat_gateway_id         = aws_nat_gateway.nat_gw_c.id             # NAT Gateway C ID
 }
 
-resource "aws_route_table_association" "private_c" {
-  subnet_id      = aws_subnet.private_app_c.id
-  route_table_id = aws_route_table.private_app_c.id
+# Private App Subnet C에 Route Table 연결
+resource "aws_route_table_association" "private_c" {               # Route Table Association 리소스 정의
+  subnet_id      = aws_subnet.private_app_c.id                     # 연결할 Subnet ID
+  route_table_id = aws_route_table.private_app_c.id                # 연결할 Route Table ID
 }
 
-# 3. 프라이빗 db 서브넷 A 전용 라우팅 테이블
-resource "aws_route_table" "private_db_a" {
-  vpc_id = aws_vpc.main.id
+# =====================================================
+# Private DB Subnet A Route Table
+# =====================================================
 
-  tags = {
-    Name = "private-db-rt-a"
+# Private DB Route Table A 생성
+resource "aws_route_table" "private_db_a" {                        # Private DB Route Table 리소스 정의 (가용 영역 A)
+  vpc_id = aws_vpc.main.id                                         # VPC ID
+
+  tags = {                                                         # 태그 맵
+    Name = "private-db-rt-a"                                       # Route Table 이름
   }
 }
 
-resource "aws_route_table_association" "private_db_a" {
-  subnet_id      = aws_subnet.private_db_a.id
-  route_table_id = aws_route_table.private_db_a.id
+# Private DB Subnet A에 Route Table 연결
+resource "aws_route_table_association" "private_db_a" {            # Route Table Association 리소스 정의
+  subnet_id      = aws_subnet.private_db_a.id                      # 연결할 Subnet ID
+  route_table_id = aws_route_table.private_db_a.id                 # 연결할 Route Table ID
 }
 
-# 4. 프라이빗 db 서브넷 C 전용 라우팅 테이블
-resource "aws_route_table" "private_db_c" {
-  vpc_id = aws_vpc.main.id
+# =====================================================
+# Private DB Subnet C Route Table
+# =====================================================
 
-  tags = {
-    Name = "private-db-rt-c"
+# Private DB Route Table C 생성
+resource "aws_route_table" "private_db_c" {                        # Private DB Route Table 리소스 정의 (가용 영역 C)
+  vpc_id = aws_vpc.main.id                                         # VPC ID
+
+  tags = {                                                         # 태그 맵
+    Name = "private-db-rt-c"                                       # Route Table 이름
   }
 }
 
-resource "aws_route_table_association" "private_db_c" {
-  subnet_id      = aws_subnet.private_db_c.id
-  route_table_id = aws_route_table.private_db_c.id
+# Private DB Subnet C에 Route Table 연결
+resource "aws_route_table_association" "private_db_c" {            # Route Table Association 리소스 정의
+  subnet_id      = aws_subnet.private_db_c.id                      # 연결할 Subnet ID
+  route_table_id = aws_route_table.private_db_c.id                 # 연결할 Route Table ID
 }

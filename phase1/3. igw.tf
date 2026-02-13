@@ -1,8 +1,8 @@
-# 인터넷 게이트웨이 생성
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.main.id
+# Internet Gateway 생성
+resource "aws_internet_gateway" "igw" {                            # Internet Gateway 리소스 정의
+  vpc_id = aws_vpc.main.id                                         # 연결할 VPC ID
 
-  tags = {
-    Name = "igw"
+  tags = {                                                         # 태그 맵
+    Name = "igw"                                                   # Internet Gateway 이름
   }
 }
