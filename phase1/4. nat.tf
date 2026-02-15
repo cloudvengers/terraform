@@ -22,6 +22,8 @@ resource "aws_nat_gateway" "nat_gw_a" {                            # NAT Gateway
   tags = {                                                         # 태그 맵
     Name = "public-subnet-a-nat-gw"                                # NAT Gateway 이름
   }
+
+  depends_on = [aws_internet_gateway.igw]                          # IGW가 먼저 생성되어야 NAT Gateway가 정상 동작
 }
 
 # NAT Gateway C (Public Subnet C)
@@ -32,4 +34,6 @@ resource "aws_nat_gateway" "nat_gw_c" {                            # NAT Gateway
   tags = {                                                         # 태그 맵
     Name = "public-subnet-c-nat-gw"                                # NAT Gateway 이름
   }
+
+  depends_on = [aws_internet_gateway.igw]                          # IGW가 먼저 생성되어야 NAT Gateway가 정상 동작
 }
